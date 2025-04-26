@@ -1,17 +1,8 @@
-# Python virtual environments
-venv/
-fresh_venv/
-env/
-.env/
-.venv/
-*venv*/
-
-# Python bytecode and binaries
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.dylib
 .Python
 build/
 develop-eggs/
@@ -28,6 +19,50 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Project specific
+backend/venv/
+frontend/node_modules/
+*.so
+*.dylib
+*.dll
+*.log
+*.sqlite
+*.db
 
 # Large binary files and libraries
 *.dylib
@@ -36,37 +71,6 @@ wheels/
 *.pyd
 *.lib
 *.a
-
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
 # Unit test / coverage reports
 htmlcov/
@@ -84,8 +88,6 @@ logs/
 *.log
 
 # Environment variables
-.env
-.env.local
 .env.*.local
 .env.*
 
