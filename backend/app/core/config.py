@@ -14,11 +14,17 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3000"
-    CORS_METHODS: str = "GET,POST,PUT,DELETE,OPTIONS"
-    CORS_HEADERS: str = "Content-Type,Authorization,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
+    CORS_ORIGINS: Union[str, List[str]] = ["http://localhost:3000"]
+    CORS_METHODS: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+    CORS_HEADERS: List[str] = ["*"]
     CORS_CREDENTIALS: bool = True
-    CORS_MAX_AGE: int = 600  # 10 minutes
+    CORS_MAX_AGE: int = 3600  # 1 hour
+
+    @validator("CORS_ORIGINS", pre=True)
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            return [i.strip() for i in v.split(",")]
+        return v
 
     # Database
     POSTGRES_SERVER: str

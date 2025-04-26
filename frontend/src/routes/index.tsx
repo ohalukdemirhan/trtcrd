@@ -1,61 +1,162 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { useAuth } from '../hooks/useAuth';
 
-// Lazy load components
-const Dashboard = React.lazy(() => import('../pages/Dashboard'));
-const Translations = React.lazy(() => import('../pages/Translations'));
-const ComplianceRules = React.lazy(() => import('../pages/ComplianceRules'));
-const UsageBilling = React.lazy(() => import('../pages/UsageBilling'));
-const Profile = React.lazy(() => import('../pages/Profile'));
-const Settings = React.lazy(() => import('../pages/Settings'));
-const Login = React.lazy(() => import('../pages/auth/Login'));
-const Register = React.lazy(() => import('../pages/auth/Register'));
+// Layout Components
+import Layout from '../components/layout/Layout';
+import AdminLayout from '../components/admin/AdminLayout';
 
-// Loading component
-const LoadingFallback = () => (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        Loading...
-    </div>
-);
+// Pages
+import Login from '../pages/auth/Login';
+import Register from '../pages/auth/Register';
+import HomePage from '../pages';
+import ProfilePage from '../pages/Profile';
+import SettingsPage from '../pages/Settings';
+import ComplianceRulesPage from '../pages/ComplianceRules';
+import ProfessionalTranslation from '../pages/ProfessionalTranslation';
+import ModernDashboard from '../pages/ModernDashboard';
+import ModernTranslations from '../pages/ModernTranslations';
+import ModernSubscription from '../pages/ModernSubscription';
 
-// Protected Route wrapper
-interface ProtectedRouteProps {
-    children: React.ReactNode;
-}
+// Admin Components
+import AdminDashboard from '../components/admin/AdminDashboard';
+import UsersManagement from '../components/admin/UsersManagement';
+import AdminSubscriptions from '../components/admin/AdminSubscriptions';
+import AdminTranslations from '../components/admin/AdminTranslations';
+import AdminCompliance from '../components/admin/AdminCompliance';
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const token = useSelector((state: RootState) => state.auth.token);
-    
-    if (!token) {
-        return <Navigate to="/auth/login" replace />;
-    }
-    
-    return <>{children}</>;
-};
+// Protected Route Component
+import ProtectedRoute from './ProtectedRoute';
 
 const AppRoutes: React.FC = () => {
-    return (
-        <React.Suspense fallback={<LoadingFallback />}>
-            <Routes>
-                {/* Public routes */}
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/auth/register" element={<Register />} />
-                
-                {/* Protected routes */}
-                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/translations" element={<ProtectedRoute><Translations /></ProtectedRoute>} />
-                <Route path="/compliance" element={<ProtectedRoute><ComplianceRules /></ProtectedRoute>} />
-                <Route path="/usage" element={<ProtectedRoute><UsageBilling /></ProtectedRoute>} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                
-                {/* Fallback route */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </React.Suspense>
-    );
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route 
+        path="/login" 
+        element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
+      />
+      <Route 
+        path="/register" 
+        element={user ? <Navigate to="/dashboard" replace /> : <Register />} 
+      />
+
+      {/* Protected routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ModernDashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProfilePage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/translations"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ModernTranslations />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/compliance"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ComplianceRulesPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/usage"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ModernSubscription />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/professional-translation"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProfessionalTranslation />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Navigate to="/admin/dashboard" replace />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Routes>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="users" element={<UsersManagement />} />
+                <Route path="subscriptions" element={<AdminSubscriptions />} />
+                <Route path="translations" element={<AdminTranslations />} />
+                <Route path="compliance" element={<AdminCompliance />} />
+              </Routes>
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default redirect */}
+      <Route
+        path="*"
+        element={
+          <Navigate to={user ? "/dashboard" : "/login"} replace />
+        }
+      />
+    </Routes>
+  );
 };
 
 export default AppRoutes; 
