@@ -4,12 +4,14 @@ fresh_venv/
 env/
 .env/
 .venv/
+*venv*/
 
-# Python bytecode
+# Python bytecode and binaries
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.dylib
 .Python
 build/
 develop-eggs/
@@ -26,6 +28,14 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Large binary files and libraries
+*.dylib
+*.so
+*.dll
+*.pyd
+*.lib
+*.a
 
 # IDE files
 .idea/
@@ -77,6 +87,12 @@ logs/
 .env
 .env.local
 .env.*.local
+.env.*
 
 # System files
 Thumbs.db 
+.DS_Store
+
+# Paddle specific
+**/paddle/libs/*
+**/paddle/base/* 
