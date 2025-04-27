@@ -9,39 +9,37 @@ import {
     UsageStats,
 } from '../types';
 
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL || '/api/v1',
+});
+
+// Add Authorization header if token exists
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Handle errors globally
+api.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 class ApiService {
     public api: AxiosInstance;
 
     constructor() {
-        this.api = axios.create({
-            baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            withCredentials: false,
-        });
-
-        // Add auth token to requests
-        this.api.interceptors.request.use((config) => {
-            const token = localStorage.getItem('token');
-            if (token && config.headers) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-            return config;
-        });
-
-        // Handle errors globally
-        this.api.interceptors.response.use(
-            (response) => response,
-            (error: AxiosError) => {
-                if (error.response?.status === 401) {
-                    localStorage.removeItem('token');
-                    window.location.href = '/login';
-                }
-                return Promise.reject(error);
-            }
-        );
+        this.api = api;
     }
 
     // Auth endpoints
@@ -167,4 +165,4 @@ class ApiService {
     }
 }
 
-export const api = new ApiService(); 
+export const apiService = new ApiService(); 

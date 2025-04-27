@@ -186,4 +186,36 @@ export const darkTheme: Theme = createTheme({
         },
         divider: '#334155',
     },
+});
+
+export const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#2563eb',
+            light: '#60a5fa',
+            dark: '#1d4ed8',
+        },
+        secondary: {
+            main: '#7c3aed',
+            light: '#a78bfa',
+            dark: '#5b21b6',
+        },
+        background: {
+            default: '#f8fafc',
+            paper: '#ffffff',
+        },
+    },
+    typography: {
+        fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    textTransform: 'none',
+                    borderRadius: 8,
+                },
+            },
+        },
+    },
 }); 
