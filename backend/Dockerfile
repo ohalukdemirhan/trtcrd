@@ -22,6 +22,7 @@ WORKDIR /app
 RUN useradd -m -u 1000 appuser && \
     apt-get update && apt-get install -y \
     libpq5 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy wheels from builder

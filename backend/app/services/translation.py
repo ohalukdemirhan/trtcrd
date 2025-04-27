@@ -4,7 +4,7 @@ from openai import AsyncOpenAI
 from app.core.config import settings
 from app.core.exceptions import TranslationError
 import json
-import aioredis
+from redis.asyncio import Redis
 import hashlib
 
 class TranslationService:
@@ -24,7 +24,7 @@ class TranslationService:
                 connection_kwargs["password"] = settings.REDIS_PASSWORD
             
             try:
-                self._redis = await aioredis.from_url(
+                self._redis = Redis.from_url(
                     redis_url,
                     **connection_kwargs
                 )
@@ -33,13 +33,13 @@ class TranslationService:
             except Exception as e:
                 # If authentication fails, try without password
                 if "AUTH" in str(e):
-                    self._redis = await aioredis.from_url(
+                    self._redis = Redis.from_url(
                         redis_url,
                         decode_responses=True
                     )
                     await self._redis.ping()
                 else:
-                    raise
+                    raise e
         return self._redis
 
     def _generate_cache_key(self, text: str, source_lang: str, target_lang: str, context: Dict[str, Any]) -> str:

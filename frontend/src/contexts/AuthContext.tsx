@@ -1,98 +1,95 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
-import { api } from '../services/api';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { apiService } from '../services/api';
 
 interface AuthContextType {
-  user: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (data: { email: string; password: string; full_name: string; company_name?: string }) => Promise<void>;
+  logout: () => void;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Check for stored token and validate it
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Set the token in the API instance
-      api.api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      // Validate token with backend
-      api.api.get('/auth/me')
-        .then(response => {
-          setUser(response.data);
-        })
-        .catch((error) => {
-          console.error('Auth validation error:', error);
-          localStorage.removeItem('token');
-          delete api.api.defaults.headers.common['Authorization'];
-          setUser(null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const login = async (email: string, password: string) => {
+    console.log('AuthContext: Login attempt', { email });
+    setLoading(true);
+    setError(null);
+    
     try {
-      setError(null);
-      setLoading(true);
+      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          username: email,
+          password: password,
+        }),
+      });
       
-      // Attempt login
-      const { access_token } = await api.login(email, password);
-      localStorage.setItem('token', access_token);
+      console.log('Login response status:', response.status);
       
-      // Get user data
-      try {
-        const response = await api.api.get('/auth/me');
-        setUser(response.data);
-      } catch (userError) {
-        console.error('Failed to fetch user data:', userError);
-        throw new Error('Failed to fetch user data after login');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Login failed:', errorData);
+        throw new Error(errorData.detail || `Login failed with status ${response.status}`);
       }
-    } catch (err) {
-      console.error('Login process error:', err);
-      setError('Login failed. Please check your credentials and try again.');
-      throw err;
+      
+      const data = await response.json();
+      console.log('Login success, received token:', !!data.access_token);
+      
+      localStorage.setItem('token', data.access_token);
+      
+      setIsAuthenticated(true);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Failed to login. Please try again.');
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const register = async (data: { email: string; password: string; full_name: string; company_name?: string }) => {
+    setLoading(true);
+    setError(null);
     try {
-      setError(null);
-      localStorage.removeItem('token');
-      delete api.api.defaults.headers.common['Authorization'];
-      setUser(null);
-    } catch (err) {
-      console.error('Logout error:', err);
-      setError('Logout failed. Please try again.');
-      throw err;
+      await apiService.post('/auth/register', data);
+      console.log('Registration successful');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.response?.data?.detail || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    console.log('User logged out');
+  };
+
+  console.log('Auth state:', { isAuthenticated, loading, hasError: !!error });
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, loading, error }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }; 

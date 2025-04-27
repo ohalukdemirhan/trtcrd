@@ -1,0 +1,3 @@
+"""
+Paddle payment integration module
+""" 

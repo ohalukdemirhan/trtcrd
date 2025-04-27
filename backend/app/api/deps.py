@@ -7,7 +7,7 @@ from app.core.config import settings
 from app.core.security import RateLimiter
 from app.db.session import SessionLocal
 from app.models.models import User, Subscription, SubscriptionTier
-import aioredis
+from redis.asyncio import Redis
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login"
@@ -23,7 +23,7 @@ def get_db() -> Generator:
     finally:
         db.close()
 
-async def get_redis() -> aioredis.Redis:
+async def get_redis() -> Redis:
     """
     Redis client dependency
     """
@@ -36,7 +36,7 @@ async def get_redis() -> aioredis.Redis:
         connection_kwargs["password"] = settings.REDIS_PASSWORD
     
     try:
-        redis = await aioredis.from_url(
+        redis = Redis.from_url(
             redis_url,
             **connection_kwargs
         )
@@ -45,13 +45,14 @@ async def get_redis() -> aioredis.Redis:
     except Exception as e:
         # If authentication fails, try without password
         if "AUTH" in str(e):
-            redis = await aioredis.from_url(
+            redis = Redis.from_url(
                 redis_url,
                 decode_responses=True
             )
             await redis.ping()
         else:
-            raise
+            raise e
+    
     try:
         yield redis
     finally:
