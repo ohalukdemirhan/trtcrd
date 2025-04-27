@@ -26,6 +26,15 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",")]
         return v
 
+    @validator("CORS_METHODS", pre=True)
+    def assemble_cors_methods(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [i.strip() for i in v.split(",")]
+        return v
+
     # Database
     POSTGRES_SERVER: str
     POSTGRES_USER: str

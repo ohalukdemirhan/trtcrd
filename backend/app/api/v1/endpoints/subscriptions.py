@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 import stripe
-from paddle_client import PaddleClient
+from app.paddle.paddle import PaddleClient
 from app.api import deps
 from app.core.config import settings
 from app.schemas.schemas import (
@@ -13,6 +13,10 @@ from app.schemas.schemas import (
 from app.models.models import SubscriptionTier
 
 router = APIRouter()
+
+class PaddleError(Exception):
+    """Base exception for Paddle API errors"""
+    pass
 
 # Configure payment providers
 stripe.api_key = settings.STRIPE_API_KEY

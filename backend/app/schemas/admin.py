@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
 from datetime import datetime
+from app.core.enums import SubscriptionTier, SubscriptionStatus
 
 class DashboardStats(BaseModel):
     total_users: int
@@ -10,9 +11,9 @@ class DashboardStats(BaseModel):
     recent_translations: List[dict]
 
 class SubscriptionUpdate(BaseModel):
-    status: Optional[str]
-    tier: Optional[str]
-    end_date: Optional[datetime]
+    status: Optional[SubscriptionStatus] = None
+    tier: Optional[SubscriptionTier] = None
+    end_date: Optional[datetime] = None
 
 class ComplianceTemplateBase(BaseModel):
     name: str
@@ -35,4 +36,4 @@ class ComplianceTemplate(ComplianceTemplateBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 
