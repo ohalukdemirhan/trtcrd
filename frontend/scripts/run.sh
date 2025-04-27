@@ -35,7 +35,7 @@ start_dev() {
     set_env "development"
     install_deps
     echo "Starting development server..."
-    npm start
+    npx react-scripts start
 }
 
 # Function to build for production
@@ -43,7 +43,7 @@ build_prod() {
     set_env "production"
     install_deps
     echo "Building the application for production..."
-    npm run build
+    npx react-scripts build
     echo "Build completed. The production files are in the build/ directory."
 }
 

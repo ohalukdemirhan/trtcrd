@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "./scripts/run.sh dev",
-    "start": "./scripts/run.sh dev",
+    "start": "react-scripts start",
     "build": "./scripts/run.sh build",
     "docker": "./scripts/run.sh docker",
     "test": "react-scripts test",

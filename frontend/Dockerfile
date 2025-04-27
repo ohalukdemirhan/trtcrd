@@ -7,8 +7,10 @@ WORKDIR /app
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies with specific flags for production
-RUN npm ci --only=production --legacy-peer-deps
+# Install dependencies with specific flags for production and skip husky
+ENV HUSKY=0
+ENV NODE_OPTIONS=--openssl-legacy-provider
+RUN npm install --legacy-peer-deps
 
 # Copy source code and configuration
 COPY . .
@@ -19,7 +21,7 @@ ENV REACT_APP_ENV=production
 ENV NODE_ENV=production
 
 # Build the application
-RUN npm run build
+RUN npx react-scripts build
 
 # Production stage
 FROM nginx:alpine-slim
@@ -57,4 +59,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:80/health || exit 1
 
 # Start nginx with optimized settings
-CMD ["nginx", "-g", "daemon off; worker_processes auto; worker_rlimit_nofile 65535;"] 
+CMD ["nginx", "-g", "daemon off;"] 

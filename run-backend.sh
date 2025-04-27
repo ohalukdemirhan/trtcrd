@@ -27,6 +27,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES=11520
 
 # CORS
 CORS_ORIGINS=[\"http://localhost:3000\"]
+CORS_METHODS=[\"GET\",\"POST\",\"PUT\",\"DELETE\",\"OPTIONS\",\"PATCH\"]
+CORS_HEADERS=[\"*\"]
+CORS_CREDENTIALS=true
+CORS_MAX_AGE=3600
 
 # Database Configuration
 POSTGRES_USER=postgres
@@ -55,6 +59,7 @@ STRIPE_WEBHOOK_SECRET=dummy-stripe-webhook-secret
 # Paddle Configuration (placeholder)
 PADDLE_API_KEY=dummy-paddle-key
 PADDLE_WEBHOOK_SECRET=dummy-paddle-webhook-secret
+PADDLE_VENDOR_ID=dummy-paddle-vendor-id
 
 # Frontend Configuration
 REACT_APP_API_URL=http://localhost:8000/api/v1

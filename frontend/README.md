@@ -1,111 +1,54 @@
-# TrtCrd Frontend
+# React + TypeScript + Vite
 
-This is the frontend for the TrtCrd application, a comprehensive solution for businesses that need translations with compliance validation, particularly in regulated industries.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- Translation management
-- Compliance checking
-- User management
-- Subscription management
-- Usage tracking
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Tech Stack
+## Expanding the ESLint configuration
 
-- React
-- TypeScript
-- Material UI
-- Redux Toolkit
-- React Router
-- Axios
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Development Setup
-
-### Prerequisites
-
-- Node.js (v16 recommended)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-2. Navigate to the frontend directory:
-   ```
-   cd frontend
-   ```
-3. Install dependencies:
-   ```
-   npm install --legacy-peer-deps
-   ```
-
-### Running the Development Server
-
-You can use the provided script to start the development server:
-
-```
-./start-dev.sh
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
 
-This script sets the necessary environment variables and starts the development server.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-Alternatively, you can run the following commands manually:
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
 ```
-export REACT_APP_API_URL=http://localhost:8000/api/v1
-export REACT_APP_ENV=development
-export NODE_OPTIONS=--openssl-legacy-provider
-npm start
-```
-
-The application will be available at http://localhost:3000.
-
-### Building for Production
-
-You can use the provided script to build the application for production:
-
-```
-./build-prod.sh
-```
-
-This script sets the necessary environment variables and builds the application.
-
-Alternatively, you can run the following commands manually:
-
-```
-export REACT_APP_API_URL=/api/v1
-export REACT_APP_ENV=production
-export NODE_OPTIONS=--openssl-legacy-provider
-npm run build
-```
-
-The production files will be in the `build/` directory.
-
-## Docker
-
-You can also run the frontend using Docker:
-
-```
-docker build -t trtcrd-frontend .
-docker run -p 3000:80 trtcrd-frontend
-```
-
-## Running with Docker Compose
-
-You can run the entire application stack (frontend, backend, database, and cache) using Docker Compose:
-
-```
-docker-compose up -d
-```
-
-This will start all the services and make the application available at http://localhost:3000.
-
-## Project Structure
-
-- `src/components`: Reusable UI components
-- `src/pages`: Page components
-- `src/routes`: Application routes
-- `src/store`: Redux store and slices
-- `src/services`: API services
-- `src/theme`: Theme configuration
-- `src/types`: TypeScript type definitions
-- `src/utils`: Utility functions 

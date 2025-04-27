@@ -80,8 +80,8 @@ const Translations: React.FC = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
-            <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+        <Box sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h4" gutterBottom>
                 Translations
             </Typography>
 
